@@ -39,7 +39,7 @@ function CreateUnits {
             for($k = $StartIndexUser; $k -le $StartIndexUser+3; $i++){
                 $userPass = ConvertTo-SecureString -String "PaSSword123!" -AsPlainText -Force;
                 $userName = "User$k";
-                New-ADUser -Path $nameChildGroup -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true;
+                New-ADUser -Path $childUnitOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true;
                 Add-ADGroupMember -Identity $nameChildGroup -Members $userName;
             }
 
