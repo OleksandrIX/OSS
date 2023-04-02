@@ -190,7 +190,7 @@ foreach ($key in $AFU.Keys)
         {
             $parent = $key;
             $OK = $key2;
-            $structures = $AFU[$key][$OK];
+            $structures = $AFU[$key][$OK].Keys;
             $result = CreatOK -OK $OK -structures $structures -parent $parent -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
             $StartGroupNumber = $result.IndexGroup;
             $StartUserNumber = $result.IndexUser;
