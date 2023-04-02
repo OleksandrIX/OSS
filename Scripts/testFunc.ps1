@@ -1,5 +1,3 @@
-$userPass = ConvertTo-SecureString -String "PaSSword123!" -AsPlainText -Force;
-
 $collectionUnits = @("Департамент фінансового забезпечення", "Департамент правового забезпечення", 
     "Департамент тилового забезпечення", "Департамент міжнародного співробітництва", "Департамент стратегічного планування");
 $collectionStuctureUnit = @("Управління департаменту","Секретаріат","1 відділ","2 відділ","3 відділ");
@@ -46,39 +44,14 @@ function CreateUnits {
             New-ADGroup -Name $nameChildGroup -GroupCategory Security -GroupScope Global -Path $childUnitOU;
             Add-ADGroupMember -Identity $unitGroup -Members $nameChildGroup;
             
-            for($i -le 3; $i++){
-                $userName = "User$i"
-                New-ADUser -Path $financeMgmtOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true
-                Add-ADGroupMember -Identity "Group3" -Members $userName
+            for($k = $StartIndexUser; $k -le $StartIndexUser+3; $i++){
+                $userPass = ConvertTo-SecureString -String "PaSSword123!" -AsPlainText -Force;
+                $userName = "User$k";
+                New-ADUser -Path $nameChildGroup -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true;
+                Add-ADGroupMember -Identity $nameChildGroup -Members $userName;
             }
+
+            $StartIndexUser += 3;
         }
     }
-    
-}
-
-function CreateUsers {
-    param (
-        [Parameter(Mandatory=$true)]
-        [int]$StartIndexGroup,
-        [int]$StartIndexUser,
-        [int]$NumbersOfGroups,
-        [int]$NumbersOfUsers
-    )
-    for($i = 1; $i -le 3; $i++){
-        $userName = "User$i"
-        New-ADUser -Path $financeMgmtOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true
-        Add-ADGroupMember -Identity "Group3" -Members $userName
-    }
-}
-
-
-
-New-ADOrganizationalUnit -Name "Управління департаменту" -Path $unitOU
-$financeMgmtOU = "OU=Управління департаменту,$unitOU"
-New-ADGroup -Name "Group3" -GroupCategory Security -GroupScope Global -Path $financeMgmtOU
-
-for($i = 1; $i -le 3; $i++){
-    $userName = "User$i"
-    New-ADUser -Path $financeMgmtOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true
-    Add-ADGroupMember -Identity "Group3" -Members $userName
 }
