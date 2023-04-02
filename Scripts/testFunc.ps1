@@ -30,15 +30,17 @@ function CreateUnits {
     )
 
     for($i = $StartIndexGroup; $i -le $unitsLenght+$StartIndexGroup; $i++){
-        New-ADOrganizationalUnit -Name $collectionUnits[$i-$StartIndexGroup] -Path $mainOU;
-        $unitOU = "OU=$collectionUnits[$i-$StartIndexGroup],$mainOU";
+        $nameUnit = $collectionUnits[$i-$StartIndexGroup];
+        New-ADOrganizationalUnit -Name $nameUnit -Path $mainOU;
+        $unitOU = "OU=$nameUnit,$mainOU";
         $unitGroup= "Group$i";
         New-ADGroup -Name $unitGroup -GroupCategory Security -GroupScope Global -Path $unitOU;
         Add-ADGroupMember -Identity $mainGroup -Members $unitGroup;
 
         for ($j = 0; $j -lt $structureUnitLenght; $j++) {
-            New-ADOrganizationalUnit -Name $collectionStuctureUnit[$j] -Path $unitOU;
-            $childUnitOU = "OU=$collectionStuctureUnit[$j],$unitOU";
+            $nameStructureUnit = $collectionStuctureUnit[$j];
+            New-ADOrganizationalUnit -Name $nameStructureUnit -Path $unitOU;
+            $childUnitOU = "OU=$nameStructureUnit,$unitOU";
             $i++;
             $nameChildGroup= "Group$i";
             New-ADGroup -Name $nameChildGroup -GroupCategory Security -GroupScope Global -Path $childUnitOU;
