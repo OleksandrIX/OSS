@@ -162,7 +162,7 @@ function CreatOK
     };
 }
 
-$rootOU = "OU=Test,DC=test14,DC=local";
+$rootOU = "OU=ЗСУ,DC=test14,DC=local";
 
 $StartGroupNumber = 0;
 $StartUserNumber = 1;
