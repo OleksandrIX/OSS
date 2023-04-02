@@ -12,21 +12,11 @@ New-ADOrganizationalUnit -Name $structureName -Path $pathOU;
 $mainOU = "OU=$structureName,$pathOU";
 New-ADGroup -Name $mainGroup -GroupCategory Security -GroupScope Global -Path $mainOU;
 
-#Департамент фінансового забезпечення. Groups: 6, Users: 15. Groups: від 2 до 7, Users: від 1 до 15
-#Департамент правового забезпечення. Groups: 6, Users: 15. Groups: від 8 до 13, Users: від 16 до 30
-#Департамент тилового забезпечення. Groups: 6, Users: 15. Groups: від 14 до 19, Users: від 31 до 45
-#Департамент міжнародного співробітництва. Groups: 6, Users: 15. Groups: від 20 до 25, Users: 46 до 60
-#Департамент стратегічного планування. Groups: 6, Users: 15. Groups: від 26 до 31, Users: 61 до 75
-#Total. StartIndexGroup: 2, StartIndexUser: 1, Groups: 30, Users: 75.
-CreateUnits -StartIndexGroup 2 -StartIndexUser 1 -NumbersOfGroups 30 -NumbersOfUsers 75;
-
 function CreateUnits {
     param (
         [Parameter(Mandatory=$true)]
         [int]$StartIndexGroup,
-        [int]$StartIndexUser,
-        [int]$NumbersOfGroups,
-        [int]$NumbersOfUsers
+        [int]$StartIndexUser
     )
 
     for($i = $StartIndexGroup; $i -le $unitsLenght+$StartIndexGroup; $i++){
@@ -57,3 +47,11 @@ function CreateUnits {
         }
     }
 }
+
+#Департамент фінансового забезпечення. Groups: 6, Users: 15. Groups: від 2 до 7, Users: від 1 до 15
+#Департамент правового забезпечення. Groups: 6, Users: 15. Groups: від 8 до 13, Users: від 16 до 30
+#Департамент тилового забезпечення. Groups: 6, Users: 15. Groups: від 14 до 19, Users: від 31 до 45
+#Департамент міжнародного співробітництва. Groups: 6, Users: 15. Groups: від 20 до 25, Users: 46 до 60
+#Департамент стратегічного планування. Groups: 6, Users: 15. Groups: від 26 до 31, Users: 61 до 75
+#Total. StartIndexGroup: 2, StartIndexUser: 1, Groups: 30, Users: 75.
+CreateUnits -StartIndexGroup 2 -StartIndexUser 1;
