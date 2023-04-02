@@ -139,7 +139,7 @@ function CreateUnits
 
 function CreatOK
 {
-    param($OK, $structure, $units, $parentOU, $parentGroup, $indexGroup, $indexUser)
+    param($OK, $structures, $parent, $parentOU, $parentGroup, $indexGroup, $indexUser)
     $nameOK = $OK;
     New-ADOrganizationalUnit -Name $nameOK -Path $parentOU;
     $okOU = "OU=$nameOK,$parentOU";
@@ -148,9 +148,13 @@ function CreatOK
     New-ADGroup -Name $okGroup -GroupCategory Security -GroupScope Global -Path $okOU;
     Add-ADGroupMember -Identity $parentGroup -Members $okGroup;
 
-    $result = CreateUnits -structure $structure -units $units -parentOU $okOU -parentGroup $okGroup -indexGroup $indexGroup -indexUser $indexUser;
-    $indexGroup = $result.IndexGroup;
-    $indexUser = $result.IndexUser;
+    foreach ($structure in $structures)
+    {
+        $units = $AFU[$parent][$OK][$structure];
+        $result = CreateUnits -structure $structure -units $units -parentOU $okOU -parentGroup $okGroup -indexGroup $indexGroup -indexUser $indexUser;
+        $indexGroup = $result.IndexGroup;
+        $indexUser = $result.IndexUser;
+    }
 
     return [pscustomobject]@{
         IndexGroup = $indexGroup
@@ -182,12 +186,12 @@ foreach ($key in $AFU.Keys)
             $StartGroupNumber = $result.IndexGroup;
             $StartUserNumber = $result.IndexUser;
         }
-        foreach ($key3 in $AFU[$key][$key2].Keys)
+        else
         {
+            $parent = $key;
             $OK = $key2;
-            $structure = $key3;
-            $units = $AFU[$key][$key2][$key3];
-            $result = CreatOK -OK $OK -structure $structure -units $units -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
+            $structures = $AFU[$key][$OK];
+            $result = CreatOK -OK $OK -structures $structures -parent $parent -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
             $StartGroupNumber = $result.IndexGroup;
             $StartUserNumber = $result.IndexUser;
         }
