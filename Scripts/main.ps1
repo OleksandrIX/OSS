@@ -101,37 +101,34 @@ $AFU.Add("Війська звʼязку та кібербезпеки", $CCT);
 
 function CreateUnits
 {
-    param($structures, $units, $parentOU, $parentGroup, $indexGroup, $indexUser)
+    param($structure, $units, $parentOU, $parentGroup, $indexGroup, $indexUser)
 
-    foreach ($structure in $structures)
+    $nameStructure = $structure;
+    New-ADOrganizationalUnit -Name $nameStructure -Path $parentOU;
+    $structureOU = "OU=$nameStructure,$parentOU";
+    $indexGroup++;
+    $structureGroup = "Group$( $indexGroup )";
+    New-ADGroup -Name $structureGroup -GroupCategory Security -GroupScope Global -Path $structureOU;
+    Add-ADGroupMember -Identity $parentGroup -Members $structureGroup;
+
+    foreach ($unit in $units)
     {
-        $nameStructure = $structure;
-        New-ADOrganizationalUnit -Name $nameStructure -Path $parentOU;
-        $structureOU = "OU=$nameStructure,$parentOU";
+        $nameUnit = $unit;
+        New-ADOrganizationalUnit -Name $nameUnit -Path $structureOU;
+        $unitOU = "OU=$nameUnit,$structureOU";
         $indexGroup++;
-        $structureGroup = "Group$( $indexGroup )";
-        New-ADGroup -Name $structureGroup -GroupCategory Security -GroupScope Global -Path $structureOU;
-        Add-ADGroupMember -Identity $parentGroup -Members $structureGroup;
+        $unitGroup = "Group$( $indexGroup )";
+        New-ADGroup -Name $unitGroup -GroupCategory Security -GroupScope Global -Path $unitOU;
+        Add-ADGroupMember -Identity $structureGroup -Members $unitGroup;
 
-        foreach ($unit in $units)
-        {
-            $nameUnit = $unit;
-            New-ADOrganizationalUnit -Name $nameUnit -Path $structureOU;
-            $unitOU = "OU=$nameUnit,$structureOU";
-            $indexGroup++;
-            $unitGroup = "Group$( $indexGroup )";
-            New-ADGroup -Name $unitGroup -GroupCategory Security -GroupScope Global -Path $unitOU;
-            Add-ADGroupMember -Identity $structureGroup -Members $unitGroup;
-
-            for($k = $indexUser; $k -le $indexUser + 2; $k++){
-                $userPass = ConvertTo-SecureString -String "PaSSword123!" -AsPlainText -Force;
-                $userName = "User$( $k )";
-                New-ADUser -Path $unitOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true;
-                Add-ADGroupMember -Identity $unitGroup -Members $userName;
-            }
-
-            $indexUser += 3;
+        for($k = $indexUser; $k -le $indexUser + 2; $k++){
+            $userPass = ConvertTo-SecureString -String "PaSSword123!" -AsPlainText -Force;
+            $userName = "User$( $k )";
+            New-ADUser -Path $unitOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true;
+            Add-ADGroupMember -Identity $unitGroup -Members $userName;
         }
+
+        $indexUser += 3;
     }
 
     return [pscustomobject]@{
@@ -140,8 +137,9 @@ function CreateUnits
     };
 }
 
-function CreatOK{
-    param($OK,$structures, $units, $parentOU, $parentGroup, $indexGroup, $indexUser)
+function CreatOK
+{
+    param($OK, $structure, $units, $parentOU, $parentGroup, $indexGroup, $indexUser)
     $nameOK = $OK;
     New-ADOrganizationalUnit -Name $nameOK -Path $parentOU;
     $okOU = "OU=$nameOK,$parentOU";
@@ -150,7 +148,7 @@ function CreatOK{
     New-ADGroup -Name $okGroup -GroupCategory Security -GroupScope Global -Path $okOU;
     Add-ADGroupMember -Identity $parentGroup -Members $okGroup;
 
-    $result = CreateUnits -structures $structures -units $units -parentOU $okOU -parentGroup $okGroup -indexGroup $indexGroup -indexUser $indexUser;
+    $result = CreateUnits -structure $structure -units $units -parentOU $okOU -parentGroup $okGroup -indexGroup $indexGroup -indexUser $indexUser;
     $indexGroup = $result.IndexGroup;
     $indexUser = $result.IndexUser;
 
@@ -175,21 +173,21 @@ foreach ($key in $AFU.Keys)
 
     foreach ($key2 in $AFU[$key].Keys)
     {
-        $structures = $AFU[$key].Keys;
+        $structure = $key2;
         $units = $AFU[$key][$key2];
         $type = $units.GetType().Name;
         if ($type -eq "Object[]")
         {
-            $result = CreateUnits -structures $structures -units $units -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
+            $result = CreateUnits -structure $structure -units $units -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
             $StartGroupNumber = $result.IndexGroup;
             $StartUserNumber = $result.IndexUser;
         }
         foreach ($key3 in $AFU[$key][$key2].Keys)
         {
             $OK = $key2;
-            $structures = $AFU[$key][$key2].Keys;
+            $structure = $key3;
             $units = $AFU[$key][$key2][$key3];
-            $result = CreatOK -OK $OK -structures $structures -units $units -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
+            $result = CreatOK -OK $OK -structure $structure -units $units -parentOU $mainOU -parentGroup $mainGroup -indexGroup $StartGroupNumber -indexUser $StartUserNumber;
             $StartGroupNumber = $result.IndexGroup;
             $StartUserNumber = $result.IndexUser;
         }
