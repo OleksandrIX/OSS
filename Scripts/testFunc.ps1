@@ -3,7 +3,6 @@ $collectionUnits = @("Департамент фінансового забезп
 $collectionStuctureUnit = @("Управління департаменту","Секретаріат","1 відділ","2 відділ","3 відділ");
 
 $unitsLenght = $collectionUnits.Length;
-$structureUnitLenght = $collectionStuctureUnit.Length;
 
 $pathOU = "OU=Test,DC=test14,DC=local";
 $structureName = "Міністерство оборони";
@@ -18,25 +17,25 @@ function CreateUnits {
         [int]$StartIndexGroup,
         [int]$StartIndexUser
     )
-
-    for($i = $StartIndexGroup; $i -le $unitsLenght+$StartIndexGroup; $i++){
-        $nameUnit = $collectionUnits[$i-$StartIndexGroup];
+    for($i = 0; $i -le $unitsLenght-1; $i++){
+        $nameUnit = $collectionUnits[$i];
         New-ADOrganizationalUnit -Name $nameUnit -Path $mainOU;
         $unitOU = "OU=$nameUnit,$mainOU";
-        $unitGroup= "Group$i";
+        $StartIndexGroup++;
+        $unitGroup= "Group$StartIndexGroup";
         New-ADGroup -Name $unitGroup -GroupCategory Security -GroupScope Global -Path $unitOU;
         Add-ADGroupMember -Identity $mainGroup -Members $unitGroup;
 
-        for ($j = 0; $j -lt $structureUnitLenght; $j++) {
-            $nameStructureUnit = $collectionStuctureUnit[$j];
+        foreach($structureUnit in $collectionStuctureUnit){
+            $nameStructureUnit = $structureUnit;
             New-ADOrganizationalUnit -Name $nameStructureUnit -Path $unitOU;
             $childUnitOU = "OU=$nameStructureUnit,$unitOU";
-            $i++;
-            $nameChildGroup= "Group$i";
+            $StartIndexGroup++;
+            $nameChildGroup= "Group$StartIndexGroup";
             New-ADGroup -Name $nameChildGroup -GroupCategory Security -GroupScope Global -Path $childUnitOU;
             Add-ADGroupMember -Identity $unitGroup -Members $nameChildGroup;
             
-            for($k = $StartIndexUser; $k -le $StartIndexUser+3; $i++){
+            for($k = $StartIndexUser; $k -le $StartIndexUser+2; $k++){
                 $userPass = ConvertTo-SecureString -String "PaSSword123!" -AsPlainText -Force;
                 $userName = "User$k";
                 New-ADUser -Path $childUnitOU -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true;
@@ -44,7 +43,7 @@ function CreateUnits {
             }
 
             $StartIndexUser += 3;
-        }
+        } 
     }
 }
 
@@ -54,4 +53,4 @@ function CreateUnits {
 #Департамент міжнародного співробітництва. Groups: 6, Users: 15. Groups: від 20 до 25, Users: 46 до 60
 #Департамент стратегічного планування. Groups: 6, Users: 15. Groups: від 26 до 31, Users: 61 до 75
 #Total. StartIndexGroup: 2, StartIndexUser: 1, Groups: 30, Users: 75.
-CreateUnits -StartIndexGroup 2 -StartIndexUser 1;
+CreateUnits -StartIndexGroup 1 -StartIndexUser 1;
