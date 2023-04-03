@@ -18,6 +18,14 @@
 </p>
 
 ### Розпакувати `zip` архів.
+
+#### В каталозі `Scripts` відкрити файл в блокноті `main.ps1`
+#### В `rootOU` треба замінити `testN` на назву вашого домену.
+#### Наприклад `test14`.
+<p align="center">
+  <img src="media/img6.png" alt="alt text">
+</p>
+
 #### В каталозі `Scripts` виконати скрипт `main.ps1` 
 <p align="center">
   <img src="media/img3.png" alt="alt text">
